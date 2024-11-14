@@ -9,7 +9,7 @@ jobs:
         strategy:
             matrix:
                 node-version: [20, 21, 22, 23]
-                os-version: ['ubuntu-latest', 'ubuntu-20.04', 'ubuntu-22.04', 'ubuntu-24.04', 'Windows11AbuPC']
+                os-version: ['ubuntu-latest', 'ubuntu-20.04', 'ubuntu-22.04', 'ubuntu-24.04']
         runs-on: 
             group: Windows-runners
             labels: ${{ matrix.os-version }}
