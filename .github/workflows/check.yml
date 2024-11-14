@@ -10,7 +10,9 @@ jobs:
             matrix:
                 node-version: [20, 21, 22, 23]
                 os-version: ['ubuntu-latest', 'ubuntu-20.04', 'ubuntu-22.04', 'ubuntu-24.04', 'Windows11AbuPC']
-        runs-on: ${{ matrix.os-version }}
+        runs-on: 
+            group: Windows-runners
+            labels: ${{ matrix.os-version }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
