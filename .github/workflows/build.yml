@@ -36,7 +36,9 @@ jobs:
             - name: Install dependencies
               run: npm ci
             - name: Build the project
-              run: npm run build
+              run: |
+                npm run build
+                ls -al ./dist
 
     deploy:
         needs: [build]
