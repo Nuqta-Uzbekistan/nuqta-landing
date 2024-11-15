@@ -40,8 +40,16 @@ jobs:
 
     deploy:
         needs: [build]
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
         steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Set up SSH
+              run: |
+                mkdir -p ~/.ssh
+                echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+                chmod 600 ~/.ssh/id_rsa
+                ssh-keyscan 109.68.212.151 >> ~/.ssh/known_hosts
             - name: Deploy to Apache server
               run: |
                 scp -r ./dist/* abu@109.68.212.151:/var/www/nuqtauz.com
