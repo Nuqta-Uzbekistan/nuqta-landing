@@ -1,8 +1,9 @@
-name: Build
+name: Build & Deploy
 on:
     push:
         branches:
             - main
+
 jobs:
     lint:
         strategy:
@@ -21,17 +22,27 @@ jobs:
               run: npm ci
             - name: Lint
               run: npm run lint
+
     build:
         needs: [lint]
-        runs-on: main-server
+        runs-on: ubuntu-latest
         steps:
-            - name: Set up QEMU
-              uses: docker/setup-qemu-action@v3
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
-            - name: Build and push
-              uses: docker/build-push-action@v6
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Setup Node
+              uses: actions/setup-node@v4
               with:
-                file: Dockerfile
-                push: false
-                tags: nuqta/nuqta-landing:latest
+                node-version: '20'
+            - name: Install dependencies
+              run: npm ci
+            - name: Build the project
+              run: npm run build
+
+    deploy:
+        needs: [build]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to Apache server
+              run: |
+                scp -r ./dist/* abu@109.68.212.151:/var/www/nuqtauz.com
+                ssh abu@109.68.212.151 'sudo systemctl restart apache2'
