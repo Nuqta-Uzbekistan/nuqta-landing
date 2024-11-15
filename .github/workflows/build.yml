@@ -50,4 +50,4 @@ jobs:
                 mkdir -p ~/.ssh
                 echo -e "Host 109.68.212.151\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
                 scp -r ./dist/* abu@109.68.212.151:/var/www/nuqtauz.com
-                ssh abu@109.68.212.151 'sudo systemctl restart apache2'
+                echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S systemctl restart apache2
