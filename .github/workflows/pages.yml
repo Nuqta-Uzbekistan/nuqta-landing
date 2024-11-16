@@ -1,13 +1,10 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Github Pages
 
 on:
   push:
-    branches: [ "pages" ]
+    branches: [ "gh-pages" ]
   pull_request:
-    branches: [ "pages" ]
+    branches: [ "gh-pages" ]
 
 jobs:
 
@@ -21,19 +18,18 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version: 16
 
     - name: Install deps
-      run: npm ci
+      run: npm install
 
     - name: Build
       run: npm run build
 
     - name: Upload static files as artifact
-      id: deployment
       uses: actions/upload-pages-artifact@v3
       with:
-        path: /build
+        path: ./dist
 
   deploy:
     environment:
@@ -43,5 +39,4 @@ jobs:
     needs: build
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
