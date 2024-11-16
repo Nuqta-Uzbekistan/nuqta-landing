@@ -2,9 +2,9 @@ name: Github Pages
 
 on:
   push:
-    branches: [ "gh-pages" ]
+    branches: [ "pages" ]
   pull_request:
-    branches: [ "gh-pages" ]
+    branches: [ "pages" ]
 
 jobs:
 
