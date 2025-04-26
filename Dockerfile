@@ -1,21 +1,29 @@
-FROM node:16 AS build
+FROM node:20-alpine AS build
 
 LABEL maintainer="Abduroziq <reply@blogchik.uz>"
 LABEL version="1.0"
-LABEL description="Nuqta jamoasning landing sahifasi imagei"
+LABEL description="Nuqta jamoasining landing sahifasi Docker imagei"
 LABEL company="Nuqta"
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json* ./
+
 RUN npm install
 
 COPY . .
+
 RUN npm run build
 
-FROM nginx:stable-alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+FROM node:20-alpine AS production
 
-EXPOSE 80
+WORKDIR /app
 
-CMD ["nginx", "-g", "daemon off;"]
+COPY --from=build /app/package.json ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
