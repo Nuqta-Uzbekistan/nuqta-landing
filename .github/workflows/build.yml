@@ -1,53 +1,53 @@
 name: Build & Deploy
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 jobs:
-    lint:
-        strategy:
-            matrix:
-                node-version: [20, 21, 22, 23]
-                os: ['ubuntu-latest', 'ubuntu-20.04', 'ubuntu-22.04', 'ubuntu-24.04']
-        runs-on: ${{ matrix.os }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                node-version: ${{ matrix.node-version }}
-            - name: Install deps
-              run: npm ci
-            - name: Lint
-              run: npm run lint
+  lint:
+    strategy:
+      matrix:
+        node-version: [20, 21, 22, 23]
+        os: ["ubuntu-latest", "ubuntu-22.04", "ubuntu-24.04"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install deps
+        run: npm ci
+      - name: Lint
+        run: npm run lint
 
-    build_deploy:
-        needs: [lint]
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                node-version: '20'
-            - name: Install dependencies
-              run: npm ci
-            - name: Build the project
-              run: |
-                npm run build
-                ls -al ./dist
-            - name: Set up SSH
-              run: |
-                mkdir -p ~/.ssh
-                echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-                chmod 600 ~/.ssh/id_rsa
-                ssh-keyscan 109.68.212.151 >> ~/.ssh/known_hosts
-            - name: Deploy to Apache server
-              run: |
-                mkdir -p ~/.ssh
-                echo -e "Host 109.68.212.151\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
-                scp -r ./dist/* abu@109.68.212.151:/var/www/nuqtauz.com
-                echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S systemctl restart apache2
+  build_deploy:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: npm ci
+      - name: Build the project
+        run: |
+          npm run build
+          ls -al ./dist
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan 109.68.212.151 >> ~/.ssh/known_hosts
+      - name: Deploy to Apache server
+        run: |
+          mkdir -p ~/.ssh
+          echo -e "Host 109.68.212.151\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
+          scp -r ./dist/* abu@109.68.212.151:/var/www/nuqtauz.com
+          echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S systemctl restart apache2
